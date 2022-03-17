@@ -24,19 +24,35 @@ router.get('/:id',validateUserId,(req, res) => {
 
 });
 
-router.post('/', validateUser,validatePost, (req, res) => {
- 
-  console.log(req.user)
-  console.log(req.text)
+router.post('/', validateUser,validatePost, (req, res, next) => {
+ User.insert({name: req.name})
+ .then(newUser =>{
+   
+   res.status(201).json(newUser)
+ })
+ .catch(next)
 });
 
-router.put('/:id', validateUserId, validateUser,(req, res) => {
-
-  console.log(req.user)
+router.put('/:id', validateUserId, validateUser,(req, res, next) => {
+   User.update(req.params.id, {name: req.name} )
+   .then(rowsChanged => {
+     res.json((rowsChanged) => {
+       return User.getById(req.params.id)
+     })
+     .then(user => {
+     res.json(user)
+    })
+   .catch(next)
 });
 
-router.delete('/:id',validateUserId,(req, res) => {
-  
+router.delete('/:id',validateUserId, async(req, res, next) => {
+  try{
+    await User.remove(req.params.id)
+   res.json(req.user)
+
+  }catch(err) {
+    next(err)
+  }
 });
 
 router.get('/:id/posts', validateUserId,(req, res) => {
@@ -54,6 +70,6 @@ router.use((err, req, res, next) => {
      stack: err.stack,
 })
 })
-
+})
 // do not forget to export the router
 module.exports = router;
