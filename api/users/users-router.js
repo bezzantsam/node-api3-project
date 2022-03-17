@@ -20,8 +20,8 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id',validateUserId,(req, res) => {
+  res.json(req.user)
 
-  console.log(req.user)
 });
 
 router.post('/', validateUser,validatePost, (req, res) => {
